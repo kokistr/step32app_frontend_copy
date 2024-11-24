@@ -61,6 +61,7 @@ export default function Signup() {
                     </button>
                 </form>
             </div>
+            <a className="m-10 text-2xl text-blue-700" href="/top-menu">Top-Menu ページへ</a>
         </div>
     );
 }
