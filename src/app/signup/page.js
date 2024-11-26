@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useState } from "react";
+import {Header, CookingMenu} from "../components/Index" 
 
 export default function Signup() {
     const [formData, setFormData] = useState({ username: "", email: "", password: "" });
@@ -17,8 +18,14 @@ export default function Signup() {
     };
 
     return (
+
         <div className="flex flex-col items-center h-screen bg-white">
             {/* 背景画像セクション */}
+            <div>
+                <Header />
+                <CookingMenu />
+            </div>
+            
             <div
                 className="w-full h-52 bg-cover bg-center"
                 style={{ backgroundImage: "url('/images/Welcome.png')" }}
