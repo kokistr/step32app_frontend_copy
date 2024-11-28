@@ -21,6 +21,11 @@ export default function Signup() {
 
         <div className="flex flex-col items-center h-screen bg-white">
             {/* 背景画像セクション */}
+            <div>
+                <Header />
+                <CookingMenu />
+            </div>
+            
             <div
                 className="w-full h-52 bg-cover bg-center"
                 style={{ backgroundImage: "url('/images/Welcome.png')" }}

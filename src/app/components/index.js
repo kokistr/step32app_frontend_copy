@@ -1,7 +1,7 @@
 import Header from "./layouts/header/Header";
-import CookingNavBar from "./layouts/cooking-menu/CookingNavBar";
+import CookingMenu from "./layouts/cooking-menu/CookingMenu";
 
 
 
 
-export {Header, CookingNavBar,};
+export {Header, CookingMenu,};
