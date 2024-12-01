@@ -2,9 +2,9 @@ import Link from 'next/link';
 
 export default function CookingNavBar() {
   const navItems = [
-    { name: 'Home', href: '/' },
-    { name: 'Suggest', href: '/suggest' },
-    { name: 'Calendar', href: '/calendar' },
+    { name: 'Home', href: '/cooking' },
+    { name: 'Suggestion', href: '/cooking/suggestion' },
+    { name: 'Calendar', href: '/cooking/calendar' },
   ];
 
   return (

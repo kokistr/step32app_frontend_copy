@@ -1,7 +1,7 @@
 "use client";
 
-import { Header } from "../components/Index";
-import { CookingNavBar } from "../components/Index";
+import {Header} from '../../components/Index'
+import {CookingNavBar} from '../../components/Index'
 
 import { useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -20,10 +20,10 @@ export default function CalendarPage() {
   });
 
   // 候補の画像リスト
-  const [candidates, setCandidates] = useState([
+  const candidates = [
     { id: 1, src: "../images/dishes/dish4.jpg" },
     { id: 2, src: "../images/dishes/dish5.jpg" },
-  ]);
+  ];
 
   // ドラッグ可能な画像コンポーネント
   const DraggableImage = ({ id, src }) => {
@@ -77,35 +77,17 @@ export default function CalendarPage() {
 
   // ドロップ時の処理
   const handleDropImage = (date, src) => {
-    setCalendarData((prevCalendarData) => {
-      const updatedCalendarData = { ...prevCalendarData };
-
-      // 既存の画像があれば候補リストに戻す
-      const existingImage = updatedCalendarData[date];
-      if (existingImage) {
-        setCandidates((prevCandidates) => [
-          ...prevCandidates,
-          { id: Date.now(), src: existingImage },
-        ]);
-      }
-
-      // 新しい画像を設定
-      updatedCalendarData[date] = src;
-
-      // 候補リストからドロップされた画像を削除
-      setCandidates((prevCandidates) =>
-        prevCandidates.filter((candidate) => candidate.src !== src)
-      );
-
-      return updatedCalendarData;
-    });
+    setCalendarData((prev) => ({
+      ...prev,
+      [date]: src,
+    }));
   };
 
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <CookingNavBar />
+        <CookingNavBar />  
 
         {/* Calendar Section */}
         <section className="white-container">
@@ -128,6 +110,15 @@ export default function CalendarPage() {
         {/* Candidate Section */}
         <section className="white-container">
           <h2 className="text-lg font-bold mb-4">Candidate</h2>
+          <div className="flex space-x-4">
+            {candidates.map((item) => (
+              <DraggableImage key={item.id} id={item.id} src={item.src} />
+            ))}
+          </div>
+        </section>
+        {/* History Section */}
+        <section className="white-container">
+          <h2 className="text-lg font-bold mb-4">History</h2>
           <div className="flex space-x-4">
             {candidates.map((item) => (
               <DraggableImage key={item.id} id={item.id} src={item.src} />
