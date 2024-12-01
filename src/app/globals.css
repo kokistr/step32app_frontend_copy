@@ -25,3 +25,30 @@ body {
     text-wrap: balance;
   }
 }
+
+
+/* ここから追加 */
+
+.main-container {
+  @apply flex-grow px-4 py-4 md:px-10;
+}
+
+.white-container {
+  @apply bg-white shadow-md rounded-lg p-6 m-1;
+}
+
+.orange-btn {
+  @apply bg-orange-500 text-white py-2 px-4 rounded-lg shadow hover:bg-orange-600;
+}
+
+.light-orange-btn {
+  @apply bg-orange-200 text-orange-700 py-2 px-4 rounded-lg shadow hover:bg-orange-300;
+}
+
+.gray-btn {
+  @apply bg-gray-300 text-gray-700 py-2 px-4 rounded-lg shadow hover:bg-gray-400;
+}
+
+.input-orange-ring {
+  @apply px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400;
+}

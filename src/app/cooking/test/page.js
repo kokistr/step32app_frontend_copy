@@ -1,7 +1,7 @@
 "use client";
 
-import { Header } from "../components/Index";
-import { CookingNavBar } from "../components/Index";
+import { Header } from "../../components/Index";
+import { CookingNavBar } from "../../components/Index";
 
 import { useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
@@ -25,11 +25,16 @@ export default function CalendarPage() {
     { id: 2, src: "../images/dishes/dish5.jpg" },
   ]);
 
+  // 履歴の画像リスト
+  const [history, setHistory] = useState([
+    { id: 3, src: "../images/dishes/dish6.jpg" },
+  ]);
+
   // ドラッグ可能な画像コンポーネント
-  const DraggableImage = ({ id, src }) => {
+  const DraggableImage = ({ id, src, source }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
       type: ItemTypes.IMAGE,
-      item: { id, src },
+      item: { id, src, source },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
@@ -51,7 +56,7 @@ export default function CalendarPage() {
   const CalendarCell = ({ date, imageSrc, onDropImage }) => {
     const [, drop] = useDrop(() => ({
       accept: ItemTypes.IMAGE,
-      drop: (item) => onDropImage(date, item.src),
+      drop: (item) => onDropImage(date, item),
     }));
 
     return (
@@ -76,29 +81,49 @@ export default function CalendarPage() {
   };
 
   // ドロップ時の処理
-  const handleDropImage = (date, src) => {
-    setCalendarData((prevCalendarData) => {
-      const updatedCalendarData = { ...prevCalendarData };
+  const handleDropImage = (date, item) => {
+    if (item.source === "calendar") {
+      // カレンダー間の移動処理
+      setCalendarData((prev) => {
+        const updated = { ...prev };
+        const previousDate = Object.keys(prev).find((key) => prev[key] === item.src);
+        if (previousDate) updated[previousDate] = undefined; // 元のセルを空にする
+        updated[date] = item.src;
+        return updated;
+      });
+    } else if (item.source === "candidates") {
+      // Candidateからカレンダーへの移動
+      setCandidates((prev) => prev.filter((candidate) => candidate.src !== item.src));
+      setCalendarData((prev) => ({
+        ...prev,
+        [date]: item.src,
+      }));
+    } else if (item.source === "history") {
+      // Historyからカレンダーへの移動（入れ替えなし）
+      setCalendarData((prev) => ({
+        ...prev,
+        [date]: item.src,
+      }));
+    }
+  };
 
-      // 既存の画像があれば候補リストに戻す
-      const existingImage = updatedCalendarData[date];
-      if (existingImage) {
-        setCandidates((prevCandidates) => [
-          ...prevCandidates,
-          { id: Date.now(), src: existingImage },
+  const handleSwapImage = (date, item) => {
+    if (calendarData[date]) {
+      // 入れ替え処理（カレンダーまたは候補と）
+      const replacedImage = calendarData[date];
+      if (item.source === "candidates") {
+        setCandidates((prev) => [
+          ...prev,
+          { id: Date.now(), src: replacedImage },
         ]);
       }
-
-      // 新しい画像を設定
-      updatedCalendarData[date] = src;
-
-      // 候補リストからドロップされた画像を削除
-      setCandidates((prevCandidates) =>
-        prevCandidates.filter((candidate) => candidate.src !== src)
-      );
-
-      return updatedCalendarData;
-    });
+      setCalendarData((prev) => ({
+        ...prev,
+        [date]: item.src,
+      }));
+    } else {
+      handleDropImage(date, item);
+    }
   };
 
   return (
@@ -118,7 +143,11 @@ export default function CalendarPage() {
                   key={date}
                   date={date}
                   imageSrc={calendarData[date]}
-                  onDropImage={handleDropImage}
+                  onDropImage={(date, item) =>
+                    calendarData[date]
+                      ? handleSwapImage(date, item)
+                      : handleDropImage(date, item)
+                  }
                 />
               );
             })}
@@ -130,7 +159,27 @@ export default function CalendarPage() {
           <h2 className="text-lg font-bold mb-4">Candidate</h2>
           <div className="flex space-x-4">
             {candidates.map((item) => (
-              <DraggableImage key={item.id} id={item.id} src={item.src} />
+              <DraggableImage
+                key={item.id}
+                id={item.id}
+                src={item.src}
+                source="candidates"
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* History Section */}
+        <section className="white-container">
+          <h2 className="text-lg font-bold mb-4">History</h2>
+          <div className="flex space-x-4">
+            {history.map((item) => (
+              <DraggableImage
+                key={item.id}
+                id={item.id}
+                src={item.src}
+                source="history"
+              />
             ))}
           </div>
         </section>
