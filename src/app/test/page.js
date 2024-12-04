@@ -1,8 +1,5 @@
 "use client";
 
-import { Header } from "../components/Index";
-import { CookingNavBar } from "../components/Index";
-
 import { useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -11,25 +8,21 @@ const ItemTypes = {
   IMAGE: "image",
 };
 
-export default function CalendarPage() {
-  // カレンダーに配置された画像の状態を管理
-  const [calendarData, setCalendarData] = useState({
-    13: "../images/dishes/dish1.jpg",
-    14: "../images/dishes/dish2.jpg",
-    20: "../images/dishes/dish3.jpg",
-  });
+// 初期レシピデータ
+const initialRecipeData = [
+  { id: 1, src: "/image1.jpg", recipeName: "Dish 1", calendarDate: null },
+  { id: 2, src: "/image2.jpg", recipeName: "Dish 2", calendarDate: null },
+  { id: 3, src: "/image3.jpg", recipeName: "Dish 3", calendarDate: null },
+];
 
-  // 候補の画像リスト
-  const [candidates, setCandidates] = useState([
-    { id: 1, src: "../images/dishes/dish4.jpg" },
-    { id: 2, src: "../images/dishes/dish5.jpg" },
-  ]);
+const CalendarPage = () => {
+  const [recipeData, setRecipeData] = useState(initialRecipeData);
 
-  // ドラッグ可能な画像コンポーネント
-  const DraggableImage = ({ id, src }) => {
+  // ドラッグ対象の画像コンポーネント
+  const DraggableImage = ({ item }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
       type: ItemTypes.IMAGE,
-      item: { id, src },
+      item: { id: item.id, src: item.src, recipeName: item.recipeName },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
@@ -38,8 +31,8 @@ export default function CalendarPage() {
     return (
       <img
         ref={drag}
-        src={src}
-        alt="Draggable Dish"
+        src={item.src}
+        alt={item.recipeName}
         className={`w-20 h-20 rounded-lg shadow-md cursor-pointer ${
           isDragging ? "opacity-50" : "opacity-100"
         }`}
@@ -47,12 +40,30 @@ export default function CalendarPage() {
     );
   };
 
-  // ドロップ可能なカレンダーセルコンポーネント
-  const CalendarCell = ({ date, imageSrc, onDropImage }) => {
+  // カレンダーセル
+  const CalendarCell = ({ date, setRecipeData }) => {
+    const itemOnDate = recipeData.find(
+      (item) => item.calendarDate === date
+    );
+
+    // ドロップ処理
     const [, drop] = useDrop(() => ({
       accept: ItemTypes.IMAGE,
-      drop: (item) => onDropImage(date, item.src),
+      drop: (droppedItem) => handleDropImage(date, droppedItem),
     }));
+
+    const handleDropImage = (date, droppedItem) => {
+      // カレンダーに画像をドロップする処理
+      setRecipeData((prev) => {
+        const updated = prev.map((item) => {
+          if (item.id === droppedItem.id) {
+            return { ...item, calendarDate: date }; // ドロップした画像を更新
+          }
+          return item;
+        });
+        return updated;
+      });
+    };
 
     return (
       <div
@@ -60,9 +71,9 @@ export default function CalendarPage() {
         className="border rounded-lg h-24 flex flex-col items-center justify-center relative"
       >
         <div className="absolute top-1 left-1 text-xs">{date}</div>
-        {imageSrc ? (
+        {itemOnDate ? (
           <img
-            src={imageSrc}
+            src={itemOnDate.src}
             alt={`Dish for ${date}`}
             className="w-16 h-16 rounded-lg"
           />
@@ -75,66 +86,34 @@ export default function CalendarPage() {
     );
   };
 
-  // ドロップ時の処理
-  const handleDropImage = (date, src) => {
-    setCalendarData((prevCalendarData) => {
-      const updatedCalendarData = { ...prevCalendarData };
-
-      // 既存の画像があれば候補リストに戻す
-      const existingImage = updatedCalendarData[date];
-      if (existingImage) {
-        setCandidates((prevCandidates) => [
-          ...prevCandidates,
-          { id: Date.now(), src: existingImage },
-        ]);
-      }
-
-      // 新しい画像を設定
-      updatedCalendarData[date] = src;
-
-      // 候補リストからドロップされた画像を削除
-      setCandidates((prevCandidates) =>
-        prevCandidates.filter((candidate) => candidate.src !== src)
-      );
-
-      return updatedCalendarData;
-    });
-  };
-
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-gray-50">
-        <Header />
-        <CookingNavBar />
+        <h2 className="text-lg font-bold mb-4">2025 August</h2>
+        <div className="grid grid-cols-7 gap-2 text-center text-sm">
+          {Array.from({ length: 31 }, (_, i) => {
+            const date = i + 1;
+            return (
+              <CalendarCell
+                key={date}
+                date={date}
+                setRecipeData={setRecipeData}
+              />
+            );
+          })}
+        </div>
 
-        {/* Calendar Section */}
-        <section className="white-container">
-          <h2 className="text-lg font-bold mb-4">2025 August</h2>
-          <div className="grid grid-cols-7 gap-2 text-center text-sm">
-            {Array.from({ length: 31 }, (_, i) => {
-              const date = (i + 1).toString();
-              return (
-                <CalendarCell
-                  key={date}
-                  date={date}
-                  imageSrc={calendarData[date]}
-                  onDropImage={handleDropImage}
-                />
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Candidate Section */}
-        <section className="white-container">
-          <h2 className="text-lg font-bold mb-4">Candidate</h2>
-          <div className="flex space-x-4">
-            {candidates.map((item) => (
-              <DraggableImage key={item.id} id={item.id} src={item.src} />
+        {/* 候補画像表示 */}
+        <div className="flex space-x-4 mt-8">
+          {recipeData
+            .filter((item) => !item.calendarDate) // カレンダーに未配置の画像を表示
+            .map((item) => (
+              <DraggableImage key={item.id} item={item} />
             ))}
-          </div>
-        </section>
+        </div>
       </div>
     </DndProvider>
   );
-}
+};
+
+export default CalendarPage;

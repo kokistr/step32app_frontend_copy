@@ -1,40 +1,58 @@
 "use client";
 
-import { Header } from "../../components/Index";
-import { CookingNavBar } from "../../components/Index";
+import { Header } from '../../components/Index';
+import { CookingNavBar } from '../../components/Index';
 
 import { useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
+// メインのレシピデータ
+const recipeData = [
+  { id: 1, title: "牛肉とたまねぎのオムレツ風炒め", onCalendar: true, calendarDate: 12, onCandidate: false, onFavorite: true, src: "../images/dishes/dish1.jpg" },
+  { id: 2, title: "世界で一番おいしい納豆ご飯", onCalendar: false, calendarDate: null, onCandidate: false, onFavorite: false, src: "../images/dishes/dish2.jpg" },
+  { id: 3, title: "シンプル豚汁", onCalendar: false, calendarDate: null, onCandidate: false, onFavorite: true, src: "../images/dishes/dish3.jpg" },
+  { id: 4, title: "肉じゃが風肉じゃが", onCalendar: true, calendarDate: 25, onCandidate: false, onFavorite: false, src: "../images/dishes/dish4.jpg" },
+  { id: 5, title: "チキンカツレツ", onCalendar: false, calendarDate: null, onCandidate: false, onFavorite: true, src: "../images/dishes/dish5.jpg" },
+  { id: 6, title: "ビーフストロガノフ", onCalendar: true, calendarDate: 8, onCandidate: false, onFavorite: false, src: "../images/dishes/dish6.jpg" },
+  { id: 7, title: "麻婆豆腐", onCalendar: false, calendarDate: null, onCandidate: true, onFavorite: true, src: "../images/dishes/dish7.jpg" },
+  { id: 8, title: "青椒肉絲", onCalendar: true, calendarDate: 30, onCandidate: false, onFavorite: false, src: "../images/dishes/dish8.jpg" },
+  { id: 9, title: "タコス", onCalendar: false, calendarDate: null, onCandidate: true, onFavorite: false, src: "../images/dishes/dish9.jpg" },
+  { id: 10, title: "ナシゴレン", onCalendar: false, calendarDate: null, onCandidate: true, onFavorite: false, src: "../images/dishes/dish10.jpg" }
+];
+
+// ドラッグ＆ドロップ用のアイテムタイプを定義
 const ItemTypes = {
   IMAGE: "image",
 };
 
 export default function CalendarPage() {
-  // カレンダーに配置された画像の状態を管理
-  const [calendarData, setCalendarData] = useState({
-    13: "../images/dishes/dish1.jpg",
-    14: "../images/dishes/dish2.jpg",
-    20: "../images/dishes/dish3.jpg",
-  });
+  // カレンダー用データを初期化
+  const initialCalendarData = recipeData
+    .filter(item => item.onCalendar)
+    .reduce((acc, item) => {
+      acc[item.calendarDate] = item.src;
+      return acc;
+    }, {});
+  const [calendarData, setCalendarData] = useState(initialCalendarData);
 
-  // 候補の画像リスト
-  const [candidates, setCandidates] = useState([
-    { id: 1, src: "../images/dishes/dish4.jpg" },
-    { id: 2, src: "../images/dishes/dish5.jpg" },
-  ]);
+  // 候補データ
+  const candidates = recipeData.filter(item => item.onCandidate).map(item => ({
+    id: item.id,
+    src: item.src
+  }));
 
-  // 履歴の画像リスト
-  const [history, setHistory] = useState([
-    { id: 3, src: "../images/dishes/dish6.jpg" },
-  ]);
+  // お気に入りデータ
+  const favorites = recipeData.filter(item => item.onFavorite).map(item => ({
+    id: item.id,
+    src: item.src
+  }));
 
   // ドラッグ可能な画像コンポーネント
-  const DraggableImage = ({ id, src, source }) => {
+  const DraggableImage = ({ id, src }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
       type: ItemTypes.IMAGE,
-      item: { id, src, source },
+      item: { id, src },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
@@ -56,7 +74,7 @@ export default function CalendarPage() {
   const CalendarCell = ({ date, imageSrc, onDropImage }) => {
     const [, drop] = useDrop(() => ({
       accept: ItemTypes.IMAGE,
-      drop: (item) => onDropImage(date, item),
+      drop: (item) => onDropImage(date, item.src),
     }));
 
     return (
@@ -81,49 +99,11 @@ export default function CalendarPage() {
   };
 
   // ドロップ時の処理
-  const handleDropImage = (date, item) => {
-    if (item.source === "calendar") {
-      // カレンダー間の移動処理
-      setCalendarData((prev) => {
-        const updated = { ...prev };
-        const previousDate = Object.keys(prev).find((key) => prev[key] === item.src);
-        if (previousDate) updated[previousDate] = undefined; // 元のセルを空にする
-        updated[date] = item.src;
-        return updated;
-      });
-    } else if (item.source === "candidates") {
-      // Candidateからカレンダーへの移動
-      setCandidates((prev) => prev.filter((candidate) => candidate.src !== item.src));
-      setCalendarData((prev) => ({
-        ...prev,
-        [date]: item.src,
-      }));
-    } else if (item.source === "history") {
-      // Historyからカレンダーへの移動（入れ替えなし）
-      setCalendarData((prev) => ({
-        ...prev,
-        [date]: item.src,
-      }));
-    }
-  };
-
-  const handleSwapImage = (date, item) => {
-    if (calendarData[date]) {
-      // 入れ替え処理（カレンダーまたは候補と）
-      const replacedImage = calendarData[date];
-      if (item.source === "candidates") {
-        setCandidates((prev) => [
-          ...prev,
-          { id: Date.now(), src: replacedImage },
-        ]);
-      }
-      setCalendarData((prev) => ({
-        ...prev,
-        [date]: item.src,
-      }));
-    } else {
-      handleDropImage(date, item);
-    }
+  const handleDropImage = (date, src) => {
+    setCalendarData((prev) => ({
+      ...prev,
+      [date]: src,
+    }));
   };
 
   return (
@@ -132,9 +112,9 @@ export default function CalendarPage() {
         <Header />
         <CookingNavBar />
 
-        {/* Calendar Section */}
+        {/* カレンダーセクション */}
         <section className="white-container">
-          <h2 className="text-lg font-bold mb-4">2025 August</h2>
+          <h2 className="text-lg font-bold mb-4">2024 December</h2>
           <div className="grid grid-cols-7 gap-2 text-center text-sm">
             {Array.from({ length: 31 }, (_, i) => {
               const date = (i + 1).toString();
@@ -143,43 +123,29 @@ export default function CalendarPage() {
                   key={date}
                   date={date}
                   imageSrc={calendarData[date]}
-                  onDropImage={(date, item) =>
-                    calendarData[date]
-                      ? handleSwapImage(date, item)
-                      : handleDropImage(date, item)
-                  }
+                  onDropImage={handleDropImage}
                 />
               );
             })}
           </div>
         </section>
 
-        {/* Candidate Section */}
+        {/* 候補セクション */}
         <section className="white-container">
           <h2 className="text-lg font-bold mb-4">Candidate</h2>
           <div className="flex space-x-4">
             {candidates.map((item) => (
-              <DraggableImage
-                key={item.id}
-                id={item.id}
-                src={item.src}
-                source="candidates"
-              />
+              <DraggableImage key={item.id} id={item.id} src={item.src} />
             ))}
           </div>
         </section>
 
-        {/* History Section */}
+        {/* お気に入りセクション */}
         <section className="white-container">
-          <h2 className="text-lg font-bold mb-4">History</h2>
+          <h2 className="text-lg font-bold mb-4">Favorite</h2>
           <div className="flex space-x-4">
-            {history.map((item) => (
-              <DraggableImage
-                key={item.id}
-                id={item.id}
-                src={item.src}
-                source="history"
-              />
+            {favorites.map((item) => (
+              <DraggableImage key={item.id} id={item.id} src={item.src} />
             ))}
           </div>
         </section>

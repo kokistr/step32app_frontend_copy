@@ -18,25 +18,29 @@ export default function Header() {
             className="w-6 h-6"
           />
         </a>
-        <a href="/health">
+        {/* <a href="/health"> */} {/* 未実装 */}
+        <a href="/under-construction"> {/* 未実装 */}
           <img
             src="/icons/health.png"
             alt="Health Icon"
             className="w-6 h-6"
           />
         </a>
-        <a href="/shopping">
+        {/* <a href="/shopping"> */} {/* 未実装 */}
+        <a href="/under-construction"> {/* 未実装 */}
           <img
             src="/icons/shopping.png"
             alt="Shopping Icon"
             className="w-6 h-6"
           />
         </a>
+        <a href="/under-construction"> {/* 未実装 */}
         <img
           src="/icons/menu.png"
           alt="Menu Icon"
           className="w-6 h-6"
         />
+        </a>
       </nav>
     </header>
   )

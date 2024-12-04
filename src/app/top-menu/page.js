@@ -23,7 +23,8 @@ export default function TopMenu() {
           </a>
         </div>
         <div className="flex flex-col items-center">
-          <a href="/health" className="w-full">
+          {/* <a href="/health" className="w-full"> */}
+          <a href="/under-construction" className="w-full">
             <h2 className="text-lg font-bold text-orange-500 mb-4 text-center">
               Health
             </h2>
@@ -35,7 +36,8 @@ export default function TopMenu() {
           </a>
         </div>
         <div className="flex flex-col items-center">
-          <a href="/shopping" className="w-full">
+          {/* <a href="/shopping" className="w-full"> */}
+          <a href="/under-construction" className="w-full">
             <h2 className="text-lg font-bold text-orange-500 mb-4 text-center">
               Shopping
             </h2>
