@@ -1,32 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link"; 
 import { Header, CookingNavBar } from "../../components/Index";
 
-// 各タブごとのレシピデータ
-const recipeData = {
-  和食: [
-    { id: 1, title: "男は黙って鯖焼き味噌だれ", img: "../images/dishes/dish1.jpg" },
-    { id: 2, title: "世界で一番おいしい納豆ご飯", img: "../images/dishes/dish2.jpg" },
-    { id: 3, title: "シンプル豚汁", img: "../images/dishes/dish3.jpg" },
-    { id: 4, title: "肉じゃが風肉じゃが", img: "../images/dishes/dish4.jpg" },
-  ],
-  洋食: [
-    { id: 5, title: "チキンカツレツ", img: "../images/dishes/dish5.jpg" },
-    { id: 6, title: "ビーフストロガノフ", img: "../images/dishes/dish6.jpg" },
-  ],
-  中華: [
-    { id: 7, title: "麻婆豆腐", img: "../images/dishes/dish7.jpg" },
-    { id: 8, title: "青椒肉絲", img: "../images/dishes/dish8.jpg" },
-  ],
-  その他: [
-    { id: 9, title: "タコス", img: "../images/dishes/dish9.jpg" },
-    { id: 10, title: "ナシゴレン", img: "../images/dishes/dish10.jpg" },
-  ],
-};
+// レシピデータ
+const recipeData = [
+  { recipeId: 1, genre: "和食", title: "牛肉とたまねぎのオムレツ風炒め", onFavorite: true, onCandidate: false, onCalendar: false, img: "../images/dishes/dish1.jpg" },
+  { recipeId: 2, genre: "和食", title: "世界で一番おいしい納豆ご飯", onFavorite: false, onCandidate: false, onCalendar: false, img: "../images/dishes/dish2.jpg" },
+  { recipeId: 3, genre: "和食", title: "シンプル豚汁", onFavorite: true, onCandidate: false, onCalendar: false, img: "../images/dishes/dish3.jpg" },
+  { recipeId: 4, genre: "和食", title: "肉じゃが風肉じゃが", onFavorite: false, onCandidate: false, onCalendar: false, img: "../images/dishes/dish4.jpg" },
+  { recipeId: 5, genre: "洋食", title: "チキンカツレツ", onFavorite: true, onCandidate: false, onCalendar: false, img: "../images/dishes/dish5.jpg" },
+  { recipeId: 6, genre: "洋食", title: "ビーフストロガノフ", onFavorite: false, onCandidate: false, onCalendar: false, img: "../images/dishes/dish6.jpg" },
+  { recipeId: 7, genre: "中華", title: "麻婆豆腐", onFavorite: true, onCandidate: false, onCalendar: false, img: "../images/dishes/dish7.jpg" },
+  { recipeId: 8, genre: "中華", title: "青椒肉絲", onFavorite: false, onCandidate: false, onCalendar: false, img: "../images/dishes/dish8.jpg" },
+  { recipeId: 9, genre: "その他", title: "タコス", onFavorite: true, onCandidate: false, onCalendar: false, img: "../images/dishes/dish9.jpg" },
+  { recipeId: 10, genre: "その他", title: "ナシゴレン", onFavorite: false, onCandidate: false, onCalendar: false, img: "../images/dishes/dish10.jpg" },
+];
 
 export default function SuggestPage() {
   const [activeTab, setActiveTab] = useState("和食"); // 現在選択されているタブ
+  const [recipes, setRecipes] = useState(recipeData); // レシピデータの状態管理
+
+  // 現在のタブに応じたレシピをフィルタリング
+  const filteredRecipes = recipes.filter((recipe) => recipe.genre === activeTab);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -34,9 +31,6 @@ export default function SuggestPage() {
       <CookingNavBar />
 
       {/* Suggest Section */}
-
-
-      {/* <section className="max-w-4xl mx-auto p-4 bg-white mt-4 rounded-lg shadow-md"> */}
       <section className="white-container">
         <div className="mb-4">
           <h2 className="text-lg font-bold text-orange-500 mb-2">Suggestion</h2>
@@ -59,26 +53,22 @@ export default function SuggestPage() {
 
         {/* Recipe Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {recipeData[activeTab].map((recipe) => (
+          {filteredRecipes.map((recipe) => (
             <div
-              key={recipe.id}
+              key={recipe.recipeId}
               className="border rounded-lg p-2 shadow-sm hover:shadow-md transition bg-white"
             >
-              <img
-                src={recipe.img}
-                alt={recipe.title}
-                className="w-full h-36 object-cover rounded-lg"
-              />
+              <Link href={`/cooking/suggestion/${recipe.recipeId}`}>
+                <img
+                  src={recipe.img}
+                  alt={recipe.title}
+                  className="w-full h-36 object-cover rounded-lg cursor-pointer"
+                />
+              </Link>
               <div className="mt-2">
                 <h3 className="text-sm font-bold text-gray-700">
                   {recipe.title}
                 </h3>
-                <div className="flex justify-between items-center mt-2">
-                  <button className="text-gray-500 hover:text-red-500">
-                    ❤️
-                  </button>
-                  <button className="text-gray-500 hover:text-red-500">🗑️</button>
-                </div>
               </div>
             </div>
           ))}
