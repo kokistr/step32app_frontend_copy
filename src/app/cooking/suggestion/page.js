@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link"; 
-import { Header, CookingNavBar } from "../../components/Index";
+import { Header, CookingNavBar } from "../../components/index";
 
 // レシピデータ
 const recipeData = [

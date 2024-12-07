@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import { Header, CookingNavBar } from "../../../components/Index";
+import { Header, CookingNavBar } from "../../../components/index";
 
 
 // レシピデータ
@@ -177,7 +177,10 @@ export default function RecipeDetailPage({ params }) {
 
           {/* 発注ボタン */}
           <div className="flex justify-center items-center w-full mb-12">
-            <button className="orange-btn w-1/3">
+            <button 
+              className="orange-btn w-1/3"
+              onClick={() => router.push('/under-construction')}
+            >
               発注
             </button>
           </div>
@@ -198,7 +201,7 @@ export default function RecipeDetailPage({ params }) {
           <div className="flex flex-col space-y-3">
             <button
               className="orange-btn"
-              onClick={() => router.push('/cooking/calendar')}
+              onClick={() => router.push('/cooking/suggestion')}
             >
               候補に追加して戻る
             </button>
