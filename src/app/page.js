@@ -1,8 +1,6 @@
 export default function Home() {
   return (
-    // <div className="flex items-center justify-center min-h-screen bg-gray-100">
     <div className="main-container">    
-      {/* <div className="bg-white shadow-lg rounded-lg max-w-md md:max-w-2xl w-full p-6 md:p-10"> */}
       <div className="white-container">
 
         {/* Image Section */}
@@ -35,6 +33,10 @@ export default function Home() {
             Already a member? Log in
           </button>
         </div>
+      </div>
+      <div className="mt-20 p-5 text-sm text-center text-red-500">
+        ※本モックアップでは、データが上書き・削除されないよう、DBの更新・削除はできないように設定していますのでご了承下さい。同ページ内のState管理は埋め込んでおり、アプリ仕様や動作確認はできますので雰囲気を味わってもらえます！
+        <br/><br/>楽しんでご使用ください！！
       </div>
     </div>
   );

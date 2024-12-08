@@ -46,12 +46,15 @@ export default function CalendarPage() {
   const candidates = recipeData.filter(item => item.onCandidate).map(item => ({
     id: item.id,
     src: item.src,
-    onFavorite: item.onFavorite
+    onFavorite: item.onFavorite,
+    isFavorite: item.onFavorite
   }));
 
   const favorites = recipeData.filter(item => item.onFavorite).map(item => ({
     id: item.id,
-    src: item.src
+    src: item.src,
+    onFavorite: item.onFavorite,
+    isFavorite: item.onFavorite
   }));
 
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -92,7 +95,7 @@ export default function CalendarPage() {
             {/* ゴミ箱ボタン */}
             <button
               onClick={() => onDeleteImage(date, imageSrc)}
-              className="absolute top-0 right-0 text-red-500 p-1"
+              className="absolute bottom-0 right-0 text-gray-300 p-1"
             >
               <FaTrashAlt />
             </button>
@@ -100,7 +103,7 @@ export default function CalendarPage() {
             {/* ハートボタン */}
             <button
               onClick={() => toggleFavorite(imageSrc)}
-              className="absolute top-0 left-0 text-red-500 p-1"
+              className="absolute top-0 right-0 text-red-500 p-1"
             >
               <FaHeart
                 className={
@@ -114,12 +117,6 @@ export default function CalendarPage() {
 
           </div>
         ) : (
-          //オリジナル（ボーダーとワードが見えると恰好悪いためコメントアウト）
-          // <div className="w-16 h-16 border border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400">
-          //   Drop Here
-          // </div>
-
-          //修正版（ボーダーとワードが見えると恰好悪いため削除）
           <div className="w-16 h-16   flex items-center justify-center text-xs text-gray-400">
             -
           </div>
@@ -264,8 +261,10 @@ export default function CalendarPage() {
                   id={candidate.id}
                   src={candidate.src}
                   onDelete={() => handleDeleteFromCandidate(candidate.src)}
-                  onFavorite={candidate.onFavorite}
+                  onFavorite={() => toggleFavorite(candidate.src)} // toggleFavorite を渡す
+                  isFavorite={candidate.isFavorite}                  
                 />
+                
               </div>
             ))}
           </div>
@@ -277,29 +276,14 @@ export default function CalendarPage() {
           <div className="flex space-x-4">
             {favorites.map((favorite) => (
               <div key={favorite.id} className="relative flex items-center justify-center">
-                <DraggableImage id={favorite.id} src={favorite.src} />
+                <DraggableImage 
+                  id={favorite.id} 
+                  src={favorite.src} 
+                  onDelete={() => handleDeleteFromFavorite(favorite.src)}
+                  onFavorite={() => toggleFavorite(favorite.src)} // toggleFavorite を渡す
+                  isFavorite={favorite.isFavorite}  
+                />
 
-                {/* ゴミ箱アイコン */}
-                <button
-                  onClick={() => handleDeleteFromFavorite(favorite.src)}
-                  className="absolute top-0 right-0 text-red-500 p-1"
-                >
-                  <FaTrashAlt />
-                </button>
-
-                {/* ハートアイコン */}
-                <button
-                  onClick={() => toggleFavorite(favorite.src)}
-                  className="absolute top-1 left-1 text-red-500 p-1"
-                >
-                  <FaHeart
-                    className={
-                      recipeData.find((item) => item.src === favorite.src)?.onFavorite
-                        ? "text-red-500"
-                        : "text-gray-400"
-                    }
-                  />
-                </button>
               </div>
             ))}
           </div>

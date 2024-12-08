@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link"; 
 import { Header, CookingNavBar } from "../../components/index";
+import { FaHeart } from "react-icons/fa"; // ハートアイコンをインポート
 
 // レシピデータ
 const recipeData = [
@@ -65,6 +66,7 @@ export default function SuggestPage() {
                   className="w-full h-36 object-cover rounded-lg cursor-pointer"
                 />
               </Link>
+              
               <div className="mt-2">
                 <h3 className="text-sm font-bold text-gray-700">
                   {recipe.title}
