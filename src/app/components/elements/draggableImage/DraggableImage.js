@@ -6,7 +6,7 @@ import { FaHeart } from "react-icons/fa"; // ハートアイコンをインポ�
 import { useRouter } from 'next/navigation'; // useRouter をインポート
 
 // ドラッグ可能な画像コンポーネント
-const DraggableImage = ({ id, src, onDelete, onFavorite }) => {
+const DraggableImage = ({ id, src, onDelete, onFavorite, isFavorite }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "image", // ドラッグのアイテムタイプ
     item: { id, src },
@@ -24,9 +24,9 @@ const DraggableImage = ({ id, src, onDelete, onFavorite }) => {
   };
 
   // ハートマークを切り替える関数
-  const toggleFavorite = () => {
-    setOnFavorite((prev) => !prev); // onFavoriteの状態を切り替え
-  };
+  // const toggleFavorite = () => {
+  //   setOnFavorite((prev) => !prev); // onFavoriteの状態を切り替え
+  // };
 
   return (
     <div className="relative">
@@ -40,8 +40,8 @@ const DraggableImage = ({ id, src, onDelete, onFavorite }) => {
 
       {/* ハートアイコン */}
       <button
-        onClick={toggleFavorite} // クリックでonFavoriteの状態を切り替え
-        className={`absolute top-1 left-1 text-lg ${onFavorite ? "text-red-500" : "text-gray-500"}`}
+        onClick={onFavorite} // クリックでonFavoriteの状態を切り替え
+        className={`absolute top-1 right-1 text-lg ${isFavorite ? "text-red-500" : "text-gray-500"}`}
       >
         <FaHeart />
       </button>
@@ -50,7 +50,7 @@ const DraggableImage = ({ id, src, onDelete, onFavorite }) => {
       {onDelete && typeof onDelete === 'function' && (
         <button
           onClick={onDelete}
-          className="absolute top-0 right-0 text-red-500 p-1"
+          className="absolute bottom-0 right-0 text-gray-300 p-1"
         >
           <FaTrashAlt />
         </button>
