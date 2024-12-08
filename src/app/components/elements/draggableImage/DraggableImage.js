@@ -1,9 +1,12 @@
+"use client"
+
 import { useDrag } from "react-dnd";
 import { FaTrashAlt } from "react-icons/fa"; // ゴミ箱アイコンをインポート
+import { FaHeart } from "react-icons/fa"; // ハートアイコンをインポート
 import { useRouter } from 'next/navigation'; // useRouter をインポート
 
 // ドラッグ可能な画像コンポーネント
-const DraggableImage = ({ id, src, onDelete }) => {
+const DraggableImage = ({ id, src, onDelete, onFavorite }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "image", // ドラッグのアイテムタイプ
     item: { id, src },
@@ -20,6 +23,11 @@ const DraggableImage = ({ id, src, onDelete }) => {
     router.push(`/cooking/suggestion/${id}`); // 該当レシピページに遷移
   };
 
+  // ハートマークを切り替える関数
+  const toggleFavorite = () => {
+    setOnFavorite((prev) => !prev); // onFavoriteの状態を切り替え
+  };
+
   return (
     <div className="relative">
       <img
@@ -29,6 +37,15 @@ const DraggableImage = ({ id, src, onDelete }) => {
         className={`w-20 h-20 rounded-lg shadow-md cursor-pointer ${isDragging ? "opacity-50" : "opacity-100"}`}
         onDoubleClick={() => handleDoubleClick(id)} // id を直接渡す
       />
+
+      {/* ハートアイコン */}
+      <button
+        onClick={toggleFavorite} // クリックでonFavoriteの状態を切り替え
+        className={`absolute top-1 left-1 text-lg ${onFavorite ? "text-red-500" : "text-gray-500"}`}
+      >
+        <FaHeart />
+      </button>
+
       {/* ゴミ箱アイコン */}
       {onDelete && typeof onDelete === 'function' && (
         <button
@@ -37,6 +54,7 @@ const DraggableImage = ({ id, src, onDelete }) => {
         >
           <FaTrashAlt />
         </button>
+        
       )}
     </div>
   );
