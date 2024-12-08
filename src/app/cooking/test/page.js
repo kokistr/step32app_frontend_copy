@@ -9,6 +9,7 @@ import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { FaTrashAlt } from "react-icons/fa"; // ゴミ箱アイコンをインポート
 import { useRouter } from 'next/navigation'; // useRouter をインポート
+import { FaHeart } from "react-icons/fa"; // ハートアイコンをインポート
 
 // メインのレシピデータ
 const initialRecipeData = [
@@ -44,7 +45,8 @@ export default function CalendarPage() {
 
   const candidates = recipeData.filter(item => item.onCandidate).map(item => ({
     id: item.id,
-    src: item.src
+    src: item.src,
+    onFavorite: item.onFavorite
   }));
 
   const favorites = recipeData.filter(item => item.onFavorite).map(item => ({
@@ -67,7 +69,9 @@ export default function CalendarPage() {
     return (
       <div
         ref={drop}
-        className="border rounded-lg h-24 flex flex-col items-center justify-center relative"
+        className={`border rounded-lg h-24 flex flex-col items-center justify-center relative ${
+          date === "18" ? "bg-orange-100" : "" // 18日だけオレンジ色を適用
+        }`}
       >
         <div
           className={`absolute top-1 left-1 text-xs ${
@@ -77,23 +81,47 @@ export default function CalendarPage() {
           {date}
         </div>
         {imageSrc ? (
-          <div className="relative">
+          <div className="relative mt-2">
             <img
               src={imageSrc}
               alt={`Dish for ${date}`}
               className="w-16 h-16 rounded-lg"
               onDoubleClick={() => handleDoubleClick(recipeData.find(item => item.src === imageSrc)?.id)}
             />
+
+            {/* ゴミ箱ボタン */}
             <button
               onClick={() => onDeleteImage(date, imageSrc)}
               className="absolute top-0 right-0 text-red-500 p-1"
             >
               <FaTrashAlt />
             </button>
+
+            {/* ハートボタン */}
+            <button
+              onClick={() => toggleFavorite(imageSrc)}
+              className="absolute top-0 left-0 text-red-500 p-1"
+            >
+              <FaHeart
+                className={
+                  recipeData.find((item) => item.src === imageSrc)?.onFavorite
+                    ? "text-red-500"
+                    : "text-gray-400"
+                }
+              />
+            </button>
+
+
           </div>
         ) : (
-          <div className="w-16 h-16 border border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400">
-            Drop Here
+          //オリジナル（ボーダーとワードが見えると恰好悪いためコメントアウト）
+          // <div className="w-16 h-16 border border-dashed border-gray-300 flex items-center justify-center text-xs text-gray-400">
+          //   Drop Here
+          // </div>
+
+          //修正版（ボーダーとワードが見えると恰好悪いため削除）
+          <div className="w-16 h-16   flex items-center justify-center text-xs text-gray-400">
+            -
           </div>
         )}
       </div>
@@ -120,6 +148,20 @@ export default function CalendarPage() {
     );
   };
 
+  // ハートマークを切り替える関数
+  const toggleFavorite = (src) => {
+    setRecipeData((prevData) =>
+      prevData.map((item) => {
+        if (item.src === src) {
+          return { ...item, onFavorite: !item.onFavorite };
+        }
+        return item;
+      })
+    );
+  };
+
+  //ここから画像削除3兄弟
+  //(1)カレンダーから画像削除→Candidateへ
   const handleDeleteImage = (date, imageSrc) => {
     setCalendarData((prev) => {
       const newData = { ...prev };
@@ -127,7 +169,7 @@ export default function CalendarPage() {
       return newData;
     });
 
-    setRecipeData((prevData) =>
+    setRecipeData((prevData) => 
       prevData.map((item) => {
         if (item.src === imageSrc) {
           return {
@@ -141,6 +183,7 @@ export default function CalendarPage() {
     );
   };
 
+  //(2)Candidateの画像削除
   const handleDeleteFromCandidate = (src) => {
     setRecipeData((prevData) =>
       prevData.map((item) => {
@@ -152,12 +195,27 @@ export default function CalendarPage() {
     );
   };
 
+  //(3)Favoriteの画像削除
+  const handleDeleteFromFavorite = (src) => {
+    setRecipeData((prevData) =>
+      prevData.map((item) => {
+        if (item.src === src) {
+          return { ...item, onFavorite: false };
+        }
+        return item;
+      })
+    );
+  };
+  
+
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-gray-50">
         <Header />
         <CookingNavBar />
 
+        {/* カレンダーセクション */}
         <section className="white-container">
           <h2 className="text-lg font-bold mb-4">2024 December</h2>
           <div className="grid grid-cols-7 gap-2 text-center text-sm">
@@ -195,7 +253,8 @@ export default function CalendarPage() {
             })}
           </div>
         </section>
-
+          
+        {/* Candidateセクション */}
         <section className="white-container mt-6">
           <h2 className="text-lg font-bold mb-4">Candidate</h2>
           <div className="flex space-x-4">
@@ -205,22 +264,47 @@ export default function CalendarPage() {
                   id={candidate.id}
                   src={candidate.src}
                   onDelete={() => handleDeleteFromCandidate(candidate.src)}
+                  onFavorite={candidate.onFavorite}
                 />
               </div>
             ))}
           </div>
         </section>
-
+        
+        {/* Favoriteセクション */}
         <section className="white-container mt-6">
           <h2 className="text-lg font-bold mb-4">Favorite</h2>
           <div className="flex space-x-4">
             {favorites.map((favorite) => (
-              <div key={favorite.id} className="flex items-center justify-center">
+              <div key={favorite.id} className="relative flex items-center justify-center">
                 <DraggableImage id={favorite.id} src={favorite.src} />
+
+                {/* ゴミ箱アイコン */}
+                <button
+                  onClick={() => handleDeleteFromFavorite(favorite.src)}
+                  className="absolute top-0 right-0 text-red-500 p-1"
+                >
+                  <FaTrashAlt />
+                </button>
+
+                {/* ハートアイコン */}
+                <button
+                  onClick={() => toggleFavorite(favorite.src)}
+                  className="absolute top-1 left-1 text-red-500 p-1"
+                >
+                  <FaHeart
+                    className={
+                      recipeData.find((item) => item.src === favorite.src)?.onFavorite
+                        ? "text-red-500"
+                        : "text-gray-400"
+                    }
+                  />
+                </button>
               </div>
             ))}
           </div>
         </section>
+
       </div>
     </DndProvider>
   );
