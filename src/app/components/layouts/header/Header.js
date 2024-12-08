@@ -9,6 +9,30 @@ export default function Header() {
             className="w-8 h-8"
           />
         </a>
+        {/* クリック不可のプロフィールアイコン */}
+        <div className="flex -space-x-2">
+          <div className="cursor-not-allowed opacity-100">
+            <img
+              src="/icons/mama.jpg"
+              alt="Profile 1"
+              className="w-8 h-8 rounded-full border-1 border-white"
+            />
+          </div>
+          <div className="cursor-not-allowed opacity-100">
+            <img
+              src="/icons/boy.jpg"
+              alt="Profile 2"
+              className="w-8 h-8 rounded-full border-1 border-white"
+            />
+          </div>
+          <div className="cursor-not-allowed opacity-50">
+            <img
+              src="/icons/papa.jpg"
+              alt="Profile 3"
+              className="w-8 h-8 rounded-full border-1 border-white"
+            />
+          </div>
+        </div>
       </div>
       <nav className="flex gap-4">
         <a href="/cooking">
@@ -18,7 +42,6 @@ export default function Header() {
             className="w-6 h-6"
           />
         </a>
-        {/* <a href="/health"> */} {/* 未実装 */}
         <a href="/under-construction"> {/* 未実装 */}
           <img
             src="/icons/health.png"
@@ -26,7 +49,6 @@ export default function Header() {
             className="w-6 h-6"
           />
         </a>
-        {/* <a href="/shopping"> */} {/* 未実装 */}
         <a href="/under-construction"> {/* 未実装 */}
           <img
             src="/icons/shopping.png"
